@@ -1,0 +1,17 @@
+# hono-dev capability bindings for vise — copy to <project>/.vise/capabilities.yaml
+# (or append these keys to an existing file). Shape: "<mcp>.<tool>": "<capability>".
+# The MCP server name is `hono` (from the plugin's .mcp.json). The x.hono.*
+# names are the extension namespace vise accepts without registration; the
+# recipes in recipes/hono-*.yaml dispatch on them.
+hono.hono_project: x.hono.project
+hono.hono_routes: x.hono.routes
+hono.hono_route: x.hono.route
+hono.hono_middleware: x.hono.middleware
+hono.hono_validators: x.hono.validators
+hono.hono_rpc: x.hono.rpc
+hono.hono_trace: x.hono.trace
+hono.hono_dependencies: x.hono.dependencies
+hono.hono_impact: x.hono.impact
+hono.hono_validate: x.hono.validate
+hono.hono_graph_export: x.hono.export_graph
+hono.hono_reindex: x.hono.reindex

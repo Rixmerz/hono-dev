@@ -1,0 +1,13 @@
+{
+  "name": "hono-dev-local",
+  "description": "Local development marketplace: install a clone of this repo as a plugin without any published index. This file deliberately does NOT claim the `rixmerz` name — Claude Code keys marketplaces by name and a clone declaring it would displace the plugins published under that marketplace.",
+  "owner": { "name": "Rixmerz" },
+  "plugins": [
+    {
+      "name": "hono-dev",
+      "source": "./",
+      "description": "Hono 4.x specialist: semantic MCP, skills, validators, hooks.",
+      "version": "0.1.0"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "hono-dev",
+  "version": "0.1.0",
+  "description": "Hono 4.x specialist for Claude Code: read-only semantic analysis MCP (composed route paths, middleware chains, validators, RPC types, request tracing, impact), Hono reasoning skills, a structural validator with a headless CLI, and hooks that keep the index fresh. Runs on Node with its own bundled TypeScript and never writes inside the analysed project except the explicit graph export. Designed to sit under vise (orchestration) and beside livespec (symbol graph).",
+  "author": { "name": "Juan Pablo Diaz" },
+  "homepage": "https://github.com/Rixmerz/hono-dev",
+  "repository": "https://github.com/Rixmerz/hono-dev",
+  "license": "MIT",
+  "keywords": [
+    "hono",
+    "mcp",
+    "routing",
+    "middleware",
+    "rpc",
+    "static-analysis",
+    "node",
+    "deno",
+    "cloudflare-workers",
+    "vise",
+    "livespec"
+  ]
+}

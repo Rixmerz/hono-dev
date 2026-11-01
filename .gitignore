@@ -1,0 +1,5 @@
+node_modules/
+.hono-dev/
+evals/results/
+.env*
+.mcp-docs/

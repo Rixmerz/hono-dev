@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "hono-worker",
+	"main": "src/index.ts",
+	// Must not be later than the newest date your installed workerd supports:
+	// `wrangler dev` refuses to start otherwise. Raise it deliberately, not by default.
+	"compatibility_date": "2026-10-23",
+	// From compatibility_date 2026-08-04 nodejs_compat is on by default; listing it
+	// keeps the intent explicit and keeps older pinned dates working.
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": { "enabled": true },
+	// Plain variables only. Secrets never go here: use `wrangler secret put`.
+	"vars": { "ENVIRONMENT": "production" },
+	// Create the namespace with `wrangler kv namespace create <NAMESPACE>` and put its id here.
+	"kv_namespaces": [{ "binding": "CACHE", "id": "<KV_NAMESPACE_ID>" }]
+}

@@ -1,0 +1,9 @@
+{
+  // JSONC on purpose: comments and trailing commas must parse.
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "nodenext",
+    "strict": true,
+    "paths": { "~/*": ["./src/*"], },
+  },
+}

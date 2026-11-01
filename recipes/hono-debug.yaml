@@ -1,0 +1,44 @@
+name: hono-debug
+description: >
+  Explain why a request behaves the way it does in a Hono 4 project. Read-only
+  consultation plan that ends in a report, not an assertion: the request
+  trace (steps in order, reached or not, params, error handler), the matched
+  route in full, the validator coverage under it and the validator findings
+  for its file. No edit belongs in this recipe; a fix, if any, is proposed by
+  the calling agent after the report — vise returns a plan, it does not
+  dispatch. Requires the hono-dev plugin bound via .vise/capabilities.yaml
+  (x.hono.* bound to the hono server tools); see integrations/vise/capabilities.yaml.
+tier: L2
+inputs:
+  - workspace    # absolute project root
+  - method       # HTTP method of the request under investigation, e.g. GET
+  - url          # concrete request path, e.g. /v1/contacts/42
+  - route_path   # FULL route pattern the request resolves to, e.g. /v1/contacts/:id (from step `trace`, handler full path)
+  - file         # file that defines the matched route (from step `trace`)
+steps:
+  - id: trace
+    capability: x.hono.trace
+    description: Matched route, ordered middleware and handler steps with reached flags, params, error handler and allowed methods
+    args:
+      workspace: "{{ inputs.workspace }}"
+      path: "{{ inputs.url }}"
+      method: "{{ inputs.method }}"
+  - id: route
+    capability: x.hono.route
+    description: The matched route in full — mount chain, middleware chain, unreached steps, validators, handler facts
+    args:
+      workspace: "{{ inputs.workspace }}"
+      method: "{{ inputs.method }}"
+      path: "{{ inputs.route_path }}"
+  - id: validators
+    capability: x.hono.validators
+    description: Validator coverage under the route pattern — which targets are validated and which are not
+    args:
+      workspace: "{{ inputs.workspace }}"
+      prefix: "{{ inputs.route_path }}"
+  - id: validate
+    capability: x.hono.validate
+    description: Findings limited to the route file, with rule IDs and hints for the report
+    args:
+      workspace: "{{ inputs.workspace }}"
+      files: ["{{ inputs.file }}"]

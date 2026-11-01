@@ -1,0 +1,57 @@
+name: hono-feature
+description: >
+  Plan a new feature in a Hono 4 project: know the project and runtime, the
+  route neighbourhood the feature lives in, the routes still missing a body
+  validator and the RPC client types the feature must not break, then
+  validate once the code exists. Read-only consultation plan: every step is a
+  query. The implementation (routes, validators, services) happens between
+  steps `rpc` and `reindex` and is done by the calling agent — vise returns a
+  plan, it does not dispatch. Requires the hono-dev plugin bound via
+  .vise/capabilities.yaml (x.hono.* bound to the hono server tools); see
+  integrations/vise/capabilities.yaml.
+tier: L2
+inputs:
+  - workspace    # absolute project root
+  - prefix       # FULL path prefix the feature lives under, e.g. /v1/billing
+steps:
+  - id: project
+    capability: x.hono.project
+    description: Hono version, runtime and entrypoint; the plan stops here if the workspace is not a Hono project
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: neighbourhood
+    capability: x.hono.routes
+    description: Routes and middleware already under the feature prefix, with full composed paths
+    args:
+      workspace: "{{ inputs.workspace }}"
+      prefix: "{{ inputs.prefix }}"
+      include_middleware: true
+  - id: validators
+    capability: x.hono.validators
+    description: Routes under the prefix that still lack a validator, so the feature does not add to them
+    args:
+      workspace: "{{ inputs.workspace }}"
+      prefix: "{{ inputs.prefix }}"
+      missing_only: true
+  - id: rpc
+    capability: x.hono.rpc
+    description: Exported app types and hc clients; new routes must keep the app type chained so clients see them (P001, P002)
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: reindex
+    capability: x.hono.reindex
+    description: Refresh the index after the feature code exists
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: validate
+    capability: x.hono.validate
+    description: Structural validation once the feature code exists
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: assert
+    capability: meta.assert
+    description: The validator must report ok
+    args:
+      condition: match
+      pattern: "^true$"
+      against: "{{ steps.validate.output.ok }}"

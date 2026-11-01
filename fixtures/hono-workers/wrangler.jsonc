@@ -1,0 +1,7 @@
+{
+  // Cloudflare Workers config (JSONC)
+  "name": "hono-workers-fixture",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-01",
+  "vars": { "GREETING": "hello", "API_TOKEN": "set-with-wrangler-secret" },
+}

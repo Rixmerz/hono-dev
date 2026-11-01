@@ -1,0 +1,31 @@
+# hono-dev quality profile for vise — copy to <project>/.vise/quality.yaml, or
+# merge the keys into an existing profile. /hono-dev:init proposes this file.
+#
+# How vise runs each entry (quality_check validator):
+#   - argv is executed WITHOUT a shell, so no pipes, globs, `&&` or $VARS.
+#   - a bare binary such as `npx` is resolved on the PATH of the vise MCP
+#     server process (Claude Code's environment), not on the project's PATH.
+#     If it is not on that PATH, replace it with its absolute path.
+#   - <ABS_PATH_TO_PLUGIN> must be the absolute path of the installed hono-dev
+#     plugin root (the directory holding bin/hono-mcp). quality.yaml does not
+#     expand ${CLAUDE_PLUGIN_ROOT}; /hono-dev:init fills the value in.
+#   - a check whose binary is missing skip-passes with source="asserted"; only a
+#     command that runs and exits nonzero blocks.
+#
+# Workflow nodes gate on the check NAME. quality-gate-graph.yaml does not gate
+# on `hono`; to use it in a project workflow add
+#   validators: [{type: quality_check, check: hono, weight: 1.0}]
+# and run `vise approve hono` once on the machine.
+
+checks:
+  # Biome is the default; swap in your own linter ("deno", "lint" on Deno,
+  # ["npx", "eslint", "."] on an ESLint project).
+  lint:  ["npx", "biome", "check", "."]
+  # Node and Bun projects. On a Deno project use ["deno", "check", "main.ts"]
+  # (the entrypoint file) instead.
+  types: ["npx", "tsc", "--noEmit"]
+  unit:  ["npx", "vitest", "run"]
+  # hono-dev structural validator: exit 0 ok, 1 on any error-severity
+  # finding, 2 when the directory is not a Hono project, 3 on internal or
+  # usage error.
+  hono:  ["<ABS_PATH_TO_PLUGIN>/bin/hono-mcp", "validate", ".", "--json"]

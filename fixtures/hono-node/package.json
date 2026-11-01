@@ -1,0 +1,13 @@
+{
+  "name": "hono-node-fixture",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": { "start": "node src/index.ts" },
+  "dependencies": {
+    "@hono/node-server": "2.1.5",
+    "@hono/zod-validator": "0.9.1",
+    "hono": "4.13.16",
+    "zod": "4.6.7"
+  }
+}

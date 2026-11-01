@@ -1,0 +1,13 @@
+{
+  "name": "hono-violations-fixture",
+  "private": true,
+  "type": "module",
+  "description": "A small Hono API with deliberate defects, one or more per validator rule family. Parsed, never executed.",
+  "dependencies": {
+    "@hono/node-server": "2.1.5",
+    "@hono/zod-validator": "0.9.1",
+    "@prisma/client": "6.0.0",
+    "hono": "4.13.16",
+    "zod": "4.6.7"
+  }
+}

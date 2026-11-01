@@ -1,0 +1,3 @@
+#!/bin/sh
+# Headless CLI: hono-mcp <command> <workspace> [flags]. See `hono-mcp help`.
+exec "$(dirname "$0")/hono-dev-run" cli "$@"

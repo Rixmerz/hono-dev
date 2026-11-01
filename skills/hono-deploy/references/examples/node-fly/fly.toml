@@ -1,0 +1,39 @@
+# Fields checked against https://docs.fly.io/reference/configuration (fetched 2026-11-01).
+app = "hono-app"          # your app name; `fly launch --copy-config` can create it
+primary_region = "iad"    # three-letter region code; see `fly platform regions`
+
+# SIGTERM is what the app handles (src/server.ts). The default is SIGINT.
+kill_signal = "SIGTERM"
+# Seconds Fly waits after the signal before it kills the process (default 5, max 300).
+# Keep it above the drain timer in src/server.ts (25 s).
+kill_timeout = 30
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Non-secret settings only. Secrets go through `fly secrets set`.
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080            # must equal the port the process binds
+  force_https = true
+  auto_stop_machines = "stop"     # "off" | "stop" | "suspend"
+  auto_start_machines = true      # enable both autostop and autostart, or neither
+  min_machines_running = 0        # only has effect with auto_stop_machines = "stop" or "suspend"
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+  [[http_service.checks]]
+    grace_period = "10s"          # wait after the Machine starts; must exceed app startup time
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

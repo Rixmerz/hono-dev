@@ -1,0 +1,57 @@
+name: hono-middleware
+description: >
+  Add or reorder a middleware in a Hono 4 project and know which requests it
+  really covers. Read-only consultation plan: the middleware chain for a
+  sample request path today, the trace showing which steps are reached, then
+  the same two views after the edit, and the middleware and security rules.
+  Hono runs entries in table order, so a use() registered after the routes or
+  mounts it should cover does not apply to them (M001, M002). The edit is
+  done by the calling agent between steps `trace` and `reindex` — vise returns
+  a plan, it does not dispatch. Requires the hono-dev plugin bound via
+  .vise/capabilities.yaml (x.hono.* bound to the hono server tools); see
+  integrations/vise/capabilities.yaml.
+tier: L2
+inputs:
+  - workspace    # absolute project root
+  - method       # HTTP method of the sample request, e.g. GET
+  - path         # sample request path the middleware must cover, e.g. /v1/integrations/google-calendar/events
+steps:
+  - id: before
+    capability: x.hono.middleware
+    description: The middleware chain for the sample request today, in order, with global, mount and route scope
+    args:
+      workspace: "{{ inputs.workspace }}"
+      method: "{{ inputs.method }}"
+      path: "{{ inputs.path }}"
+  - id: trace
+    capability: x.hono.trace
+    description: Steps in execution order with reached flags; an unreached middleware sits after the handler that ends the request
+    args:
+      workspace: "{{ inputs.workspace }}"
+      path: "{{ inputs.path }}"
+      method: "{{ inputs.method }}"
+  - id: reindex
+    capability: x.hono.reindex
+    description: Refresh the index after the edit so the next steps see the new order
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: after
+    capability: x.hono.middleware
+    description: The chain for the same request after the edit; the new middleware must appear before the handler
+    args:
+      workspace: "{{ inputs.workspace }}"
+      method: "{{ inputs.method }}"
+      path: "{{ inputs.path }}"
+  - id: validate
+    capability: x.hono.validate
+    description: Middleware and security rules once the edit exists (M001-M007, S001-S007)
+    args:
+      workspace: "{{ inputs.workspace }}"
+      categories: ["middleware", "security"]
+  - id: assert
+    capability: meta.assert
+    description: The validator must report ok
+    args:
+      condition: match
+      pattern: "^true$"
+      against: "{{ steps.validate.output.ok }}"

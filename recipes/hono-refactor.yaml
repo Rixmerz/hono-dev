@@ -1,0 +1,55 @@
+name: hono-refactor
+description: >
+  Move or rename a file in a Hono 4 project and know what it reaches before and
+  after. Read-only consultation plan: Hono-level impact of the file (apps,
+  routes, middleware, RPC types, tests), every importer of the file, then the
+  impact of the actual diff against the base ref and a full validation. The
+  move itself is done by the calling agent between steps `importers` and
+  `reindex` — vise returns a plan, it does not dispatch. Requires the
+  hono-dev plugin bound via .vise/capabilities.yaml (x.hono.* bound to the hono
+  server tools); see integrations/vise/capabilities.yaml.
+tier: L2
+inputs:
+  - workspace    # absolute project root
+  - file         # file being moved or edited, e.g. src/routes/v1/contacts.ts
+  - base         # git base ref to diff against after the move, e.g. main
+steps:
+  - id: before
+    capability: x.hono.impact
+    description: Apps, routes, middleware, RPC types and tests that depend on the file today
+    args:
+      workspace: "{{ inputs.workspace }}"
+      files: ["{{ inputs.file }}"]
+      depth: 3
+  - id: importers
+    capability: x.hono.dependencies
+    description: Every file that imports the file; each must be updated by the move
+    args:
+      workspace: "{{ inputs.workspace }}"
+      file: "{{ inputs.file }}"
+      direction: importers
+      depth: 2
+  - id: reindex
+    capability: x.hono.reindex
+    description: Refresh the index after the move
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: after
+    capability: x.hono.impact
+    description: Impact of the real diff against the base ref, with the checks to run
+    args:
+      workspace: "{{ inputs.workspace }}"
+      base: "{{ inputs.base }}"
+      depth: 3
+  - id: validate
+    capability: x.hono.validate
+    description: Full structural validation after the move (R003 and R004 catch a moved sub-app left unmounted)
+    args:
+      workspace: "{{ inputs.workspace }}"
+  - id: assert
+    capability: meta.assert
+    description: The validator must report ok
+    args:
+      condition: match
+      pattern: "^true$"
+      against: "{{ steps.validate.output.ok }}"

@@ -1,0 +1,90 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook detect",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook detect",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "DirectoryAdded": [
+      {
+        "matcher": "slash_command|register_repo_root",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook detect",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "if": "Edit(**/*.ts) | Write(**/*.ts) | MultiEdit(**/*.ts) | Edit(**/*.tsx) | Write(**/*.tsx) | MultiEdit(**/*.tsx) | Edit(**/*.mts) | Write(**/*.mts) | MultiEdit(**/*.mts) | Edit(**/*.cts) | Write(**/*.cts) | MultiEdit(**/*.cts) | Edit(**/*.js) | Write(**/*.js) | MultiEdit(**/*.js) | Edit(**/*.jsx) | Write(**/*.jsx) | MultiEdit(**/*.jsx) | Edit(**/*.mjs) | Write(**/*.mjs) | MultiEdit(**/*.mjs) | Edit(**/*.cjs) | Write(**/*.cjs) | MultiEdit(**/*.cjs) | Edit(**/package.json) | Write(**/package.json) | Edit(**/deno.json) | Write(**/deno.json) | Edit(**/deno.jsonc) | Write(**/deno.jsonc) | Edit(**/tsconfig*.json) | Write(**/tsconfig*.json) | Edit(**/wrangler.*) | Write(**/wrangler.*) | Edit(**/.hono-dev/config.json) | Write(**/.hono-dev/config.json)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook invalidate",
+            "timeout": 5,
+            "async": true
+          },
+          {
+            "type": "mcp_tool",
+            "server": "plugin:hono-dev:hono",
+            "tool": "hono_reindex",
+            "input": { "workspace": "${cwd}" },
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook validate",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "if": "Bash(git *) | Bash(npm *) | Bash(pnpm *) | Bash(yarn *) | Bash(bun *) | Bash(deno *)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook invalidate --from-bash",
+            "timeout": 5,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "matcher": "package.json|deno.json|deno.jsonc|tsconfig.json|wrangler.toml|wrangler.json|wrangler.jsonc",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/hono-dev-run\" hook invalidate",
+            "timeout": 5,
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

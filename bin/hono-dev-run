@@ -1,0 +1,42 @@
+#!/bin/sh
+# hono-dev launcher. Usage:
+#   hono-dev-run mcp                      start the MCP server (stdio)
+#   hono-dev-run cli <args...>            headless CLI (same as bin/hono-mcp)
+#   hono-dev-run hook <name> [flags]      run a hook (detect|invalidate|validate) with stdin; ALWAYS exits 0
+#
+# Runs dist/entry.cjs, the committed bundle that carries TypeScript 6.0.3, with the Node on PATH
+# (24 or newer). Nothing is resolved from node_modules, from the plugin or from the analysed project.
+# The MCP server refuses to start without Node: a server that starts and exposes no tools is worse
+# than a clear error. Hooks stay silent.
+set -u
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+MODE="${1:-}"
+[ $# -gt 0 ] && shift
+
+node_ok() {
+  command -v node >/dev/null 2>&1 || return 1
+  major="$(node --version 2>/dev/null)" || return 1
+  major="${major#v}"
+  major="${major%%.*}"
+  [ "$major" -ge 24 ] 2>/dev/null
+}
+
+case "$MODE" in
+  mcp)
+    node_ok || { echo "hono-dev: Node 24 or newer is required on PATH. Install it and restart Claude Code." >&2; exit 1; }
+    exec node "$ROOT/dist/entry.cjs" mcp --stdio "$@"
+    ;;
+  cli)
+    node_ok || { echo "hono-dev: Node 24 or newer is required on PATH" >&2; exit 3; }
+    exec node "$ROOT/dist/entry.cjs" cli "$@"
+    ;;
+  hook)
+    node_ok || exit 0
+    node "$ROOT/dist/entry.cjs" hook "$@" 2>/dev/null || true
+    exit 0
+    ;;
+  *)
+    echo "usage: hono-dev-run mcp | cli <args> | hook <detect|invalidate|validate>" >&2
+    exit 2
+    ;;
+esac

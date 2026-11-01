@@ -1,0 +1,13 @@
+# hono-dev graph export for livespec — add to <project>/.livespec.toml.
+# hono_graph_export (CLI: hono-mcp export) writes .hono-dev/graph.json
+# (Graphify node-link JSON); livespec ingests it after index_project when
+# auto_ingest is on, or by hand with ingest_external_graph(dry_run=false).
+#
+# Full composed paths (e.g. /v1/contacts/:id) live in the node attribute
+# hono_full_path of each route node; the node label carries them too, as in
+# "GET /v1/contacts/:id". livespec's own endpoint model is not changed by this
+# graph: it keeps the local path of a mounted route (e.g. /:id). To read the
+# composed path, ask the hono routes tool.
+[graph]
+external = ".hono-dev/graph.json"
+auto_ingest = true          # re-ingest after each index_project

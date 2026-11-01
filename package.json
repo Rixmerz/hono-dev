@@ -1,0 +1,39 @@
+{
+  "name": "hono-dev",
+  "version": "0.1.0",
+  "description": "Claude Code plugin: read-only semantic analysis, validators and skills for Hono 4.x",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "Juan Pablo Diaz",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "build": "node scripts/build.ts",
+    "dev:mcp": "node mcp/entry.ts mcp --stdio",
+    "cli": "node mcp/entry.ts cli"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "hono": "4.13.16",
+    "typescript": "6.0.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.4",
+    "@hono/node-server": "2.1.5",
+    "@hono/standard-validator": "0.4.1",
+    "@hono/valibot-validator": "0.6.2",
+    "@hono/zod-openapi": "1.6.3",
+    "@hono/zod-validator": "0.9.1",
+    "@types/node": "24.19.2",
+    "esbuild": "0.28.2",
+    "valibot": "1.5.0",
+    "vitest": "5.0.5"
+  }
+}
